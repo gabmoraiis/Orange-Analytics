@@ -1,9 +1,18 @@
+const apiKey = '3ff7e8b0-fffe-465c-8008-195643956c03';
+const headers = new Headers({
+    'Content-Type': 'Authorization',
+    'Authorization': apiKey,
+})
+const options ={
+    method: 'GET',
+    mode: 'cors',
+    headers: headers,
+}
 
-let playerPageUrl = 'https://www.balldontlie.io/api/v1/players/';
-let teamPageUrl = 'https://www.balldontlie.io/api/v1/teams/';
-let gamesPageUrl = 'https://www.balldontlie.io/api/v1/games?start_date=';
-let seasonAveragesPageUrl = 'https://www.balldontlie.io/api/v1/season_averages?season=2023&player_ids[]=';
-const cardBox = document.getElementById('card-box');
+let playerPageUrl = 'https://api.balldontlie.io/v1/players/';
+let teamPageUrl = 'https://api.balldontlie.io/v1/teams/';
+let gamesPageUrl = 'https://api.balldontlie.io/v1/games?start_date=';
+let seasonAveragesPageUrl = 'https://api.balldontlie.io/v1/season_averages?season=2023&player_ids[]=';
 
 window.onload = async () => {
     try {
@@ -18,11 +27,13 @@ async function loadCardsInfo(playerID) {
 
     const response1 = await callAPI(playerPageUrl, playerID);
 
-    const response2 = await callAPI(teamPageUrl, response1.team.id);
+    const response2 = await callAPI(teamPageUrl, response1.data.team.id);
 
-    const response3 = await callAPI2(gamesPageUrl, cardGamesStartDate(), cardGamesEndDate(), response1.team.id);
+    const response3 = await callAPI2(gamesPageUrl, cardGamesStartDate(), cardGamesEndDate(), response1.data.team.id);
 
     const response4 = await callAPI(seasonAveragesPageUrl, playerID);
+
+    const cardBox = document.getElementById('card-box');
 
     const card1 = document.createElement('div');
     card1.className = "card1";
@@ -34,7 +45,7 @@ async function loadCardsInfo(playerID) {
     playerName.innerHTML = 'Nome:';
     const playerNameAsnwer = document.createElement('span');
     playerNameAsnwer.className = "asnwer";
-    playerNameAsnwer.innerHTML = `${response1.first_name} ${response1.last_name}`;
+    playerNameAsnwer.innerHTML = `${response1.data.first_name} ${response1.data.last_name}`;
 
     const card1Data2 = document.createElement('p');
     const playerHeight = document.createElement('span');
@@ -42,7 +53,7 @@ async function loadCardsInfo(playerID) {
     playerHeight.innerHTML = 'Altura:';
     const playerHeightAsnwer = document.createElement('span');
     playerHeightAsnwer.className = "asnwer";
-    playerHeightAsnwer.innerHTML = `${heightConversion(response1.height_feet, response1.height_inches)}`;
+    playerHeightAsnwer.innerHTML = `${heightConversion(response1.data.height)}`;
 
     const card1Data3 = document.createElement('p');
     const playerTeam = document.createElement('span');
@@ -50,7 +61,7 @@ async function loadCardsInfo(playerID) {
     playerTeam.innerHTML = 'Equipe:';
     const playerTeamAsnwer = document.createElement('span');
     playerTeamAsnwer.className = "asnwer";
-    playerTeamAsnwer.innerHTML = `${response1.team.full_name}`;
+    playerTeamAsnwer.innerHTML = `${response1.data.team.full_name}`;
 
     const card1Data4 = document.createElement('p');
     const playerPoints = document.createElement('span');
@@ -86,8 +97,8 @@ async function loadCardsInfo(playerID) {
 
     const card2Logo = document.createElement('img');
     card2Logo.className = "card2-logo";
-    card2Logo.alt = `${response1.team.full_name}`
-    card2Logo.src = `./assets/${response1.team.full_name.replace(/ /g, "-")}-logo.png`;
+    card2Logo.alt = `${response1.data.team.full_name}`
+    card2Logo.src = `./assets/${response1.data.team.full_name.replace(/ /g, "-")}-logo.png`;
 
     const card2Data1 = document.createElement('p');
     const teamName = document.createElement('span');
@@ -95,7 +106,7 @@ async function loadCardsInfo(playerID) {
     teamName.innerHTML = 'Nome:';
     const teamNameAsnwer = document.createElement('span');
     teamNameAsnwer.className = "asnwer";
-    teamNameAsnwer.innerHTML = `${response1.team.full_name}`;
+    teamNameAsnwer.innerHTML = `${response1.data.team.full_name}`;
 
     const card2Data2 = document.createElement('p');
     const teamAbrev = document.createElement('span');
@@ -103,7 +114,7 @@ async function loadCardsInfo(playerID) {
     teamAbrev.innerHTML = 'Sigla:';
     const teamAbrevAsnwer = document.createElement('span');
     teamAbrevAsnwer.className = "asnwer";
-    teamAbrevAsnwer.innerHTML = `${response2.abbreviation}`;
+    teamAbrevAsnwer.innerHTML = `${response2.data.abbreviation}`;
 
     const card2Data3 = document.createElement('p');
     const teamCity = document.createElement('span');
@@ -111,7 +122,7 @@ async function loadCardsInfo(playerID) {
     teamCity.innerHTML = 'Cidade:';
     const teamCityAsnwer = document.createElement('span');
     teamCityAsnwer.className = "asnwer";
-    teamCityAsnwer.innerHTML = `${cityNameCorrection(response2.city)}`;
+    teamCityAsnwer.innerHTML = `${cityNameCorrection(response2.data.city)}`;
 
     const card2Data4 = document.createElement('p');
     const teamConference = document.createElement('span');
@@ -119,7 +130,7 @@ async function loadCardsInfo(playerID) {
     teamConference.innerHTML = 'Conferência:';
     const teamConferenceAsnwer = document.createElement('span');
     teamConferenceAsnwer.className = "asnwer";
-    teamConferenceAsnwer.innerHTML = `${conferenceTraduction(response2.conference)}`;
+    teamConferenceAsnwer.innerHTML = `${conferenceTraduction(response2.data.conference)}`;
 
 
     const card3 = document.createElement('div');
@@ -134,7 +145,7 @@ async function loadCardsInfo(playerID) {
 
     const card3Title = document.createElement('span');
     card3Title.className = "card3-title";
-    card3Title.innerHTML = `Próximos jogos do ${response1.team.full_name}`;
+    card3Title.innerHTML = `Próximos jogos do ${response1.data.team.full_name}`;
 
     response3.data.sort((a, b) => { return a.id - b.id });
 
@@ -202,16 +213,18 @@ async function loadCardsInfo(playerID) {
 }
 
 async function callAPI(url, param1) {
-    return await (await fetch(url + param1)).json();
+    return await (await fetch(url + param1, options)).json();
 }
 
 async function callAPI2(url, param1, param2, param3) {
-    return await (await fetch(url + param1 + param2 + param3)).json();
+    return await (await fetch(url + param1 + param2 + param3, options)).json();
 }
-function heightConversion(heightFeet, heightInches) {
-    if (heightFeet === null || heightInches === null) {
+function heightConversion(height) {
+    if (height === null) {
         return "Dado Indisponível"
     } else {
+        let heightFeet = height.slice(0,1);
+        let heightInches = height.slice(2,3);
         heightFeet = heightFeet * 30.48;
         heightInches = heightInches * 2.54;
         let centimeterHeight = ((heightFeet + heightInches) / 100).toFixed(2);
@@ -220,10 +233,11 @@ function heightConversion(heightFeet, heightInches) {
 }
 
 function cardPlayerSelection() {
-    const mainPlayers = ['237', '274', '79', '15', '175', '246', '132', '115', '140', '458', '666786', '3547238', '227', '161', '182', '56677822', '297', '490', '434', '3547239', '125', '322',
-        '17896075', '3547245', '61', '73', '38017683', '145', '17896055', '265'];
+    const mainPlayers = ['237', '274', '79', '15', '175', '246', '132', '115', '140', '458', '666786', 
+    '3547238', '227', '161', '182', '56677822', '297', '490', '434', '3547239', '125', '322','17896075',
+    '3547245', '61', '73', '38017683', '145', '17896055', '265'];
     let randomIndex = Math.floor(Math.random() * mainPlayers.length);
-    return mainPlayers[randomIndex];
+    return `${mainPlayers[randomIndex]}`;
 }
 
 function cardGamesStartDate() {
